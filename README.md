@@ -2,7 +2,11 @@
 
 RubikSQL is a general-purpose instance-optimized NL2SQL solution built on top of [AgentHeaven](https://github.com/RubikSQL/AgentHeaven).
 
-[](demo.mp4)
+
+
+https://github.com/user-attachments/assets/46eec655-8c00-4605-85c6-f210fa4c1ff3
+
+
 
 > Refactoring. Code and Python package will be released soon.
 
