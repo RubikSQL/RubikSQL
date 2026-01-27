@@ -7,8 +7,13 @@ RubikSQL is a general-purpose instance-optimized NL2SQL solution built on top of
 https://github.com/user-attachments/assets/46eec655-8c00-4605-85c6-f210fa4c1ff3
 
 
+## Update Log
 
-> Refactoring. Code and Python package will be released soon.
+- [2026-01] Initial release of **RubikBench v0.9** database on huggingface: [RubikBench](https://huggingface.co/datasets/Magolor/RubikBench).
+
+- [2025-12] [RubikSQL demo](https://github.com/RubikSQL/RubikSQL/blob/main/demo.mp4). Code, Python package, CLI, GUI (web+tauri) and packaged app will be released soon.
+
+- [2025-11] Initial relase of AgentHeaven, the framework used to build RubikSQL: [AgentHeaven](https://github.com/RubikSQL/AgentHeaven), [Documentation (To Be Updated)](https://rubiksql.github.io/AgentHeaven-docs/en/index.html).
 
 ---
 
