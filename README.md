@@ -9,6 +9,8 @@ https://github.com/user-attachments/assets/46eec655-8c00-4605-85c6-f210fa4c1ff3
 
 ## Update Log
 
+- [2026-02] **RubikBench v0.9.2** added 3198 queries. on github: [RubikBench](https://github.com/RubikSQL/RubikBench). on huggingface: [RubikBench](https://huggingface.co/datasets/Magolor/RubikBench).
+
 - [2026-01] Initial release of **RubikBench v0.9** database on huggingface: [RubikBench](https://huggingface.co/datasets/Magolor/RubikBench).
 
 - [2025-12] [RubikSQL demo](https://github.com/RubikSQL/RubikSQL/blob/main/demo.mp4). Code, Python package, CLI, GUI (web+tauri) and packaged app will be released soon.
