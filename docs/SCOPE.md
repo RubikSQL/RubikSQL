@@ -1,6 +1,6 @@
-# Public-core preparation scope
+# NL2SQL source scope
 
-Source baseline: local RubikSQL-HB `main` at `cb41144ecfab1cdef5de56e46898012c3937e2a5`. Target: a new local branch in `RubikSQL/RubikSQL`; the target's existing `main` and demo video are left intact.
+Source baseline: local RubikSQL-HB `main` at `cb41144ecfab1cdef5de56e46898012c3937e2a5`. The former introduction-only RubikSQL `main` is preserved at `archive/legacy-introduction-20261125` (`7a0abeb`); its demo video remains in the current tree.
 
 ## Included
 
@@ -23,12 +23,10 @@ The package layout, pinned tool importer, snapshot verification, and NL2SQL algo
 
 The documentation demo was also run from a separate local clone with a new `.venv`: `uv sync --offline --frozen`, the no-key smoke test, and `examples/demo/demo.py` with a DashScope embedding key all completed. The demo registered two tables and returned the expected rows (Ada 100, Lin 25) through the pinned SQL tool. The optional model-generated `--ask` path was not exercised because this isolated run had no chat gateway pool.
 
-## Review before merge or public release
+## Follow-ups before a packaged release
 
-1. Select a RubikSQL license; the target repository currently has no `LICENSE` file. Confirm attribution/redistribution of the patched HeavenBase wheel (its metadata says MIT).
-2. Decide whether the adopted snapshot, including its prompt text and 29 Python tool source files, is the intended public baseline.
-3. Decide whether to replace the historical authority binding that names the original private source remote. The local snapshot runner does not contact it; authority authoring is not part of this branch.
+1. Select a RubikSQL license; this repository currently has no `LICENSE` file. Confirm attribution/redistribution of the patched HeavenBase wheel (its metadata says MIT).
+2. The adopted snapshot includes prompt text and 29 Python tool source files. Account for those files when choosing the public license and package contents.
+3. Decide whether to replace the historical authority binding that names the original private source remote. The local snapshot runner does not contact it; authority authoring is not part of this repository.
 4. Run an end-to-end query against a disposable database with approved model credentials. The smoke check intentionally makes no paid model request.
 5. Review the remaining internal compatibility modules if the desired scope is stricter than “no self-evolution workflow.” A stricter cut needs a separate runtime/authoring boundary change.
-
-No remote branch, pull request, merge, or push has been made.
