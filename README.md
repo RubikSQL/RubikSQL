@@ -78,6 +78,20 @@ uv run python scripts/mcp_server.py
 
 Configure your MCP client to run that command in the repository directory. The server loads the verified snapshot and exposes database registration, schema inspection, knowledge retrieval, and SQL tools. Call `register_database` with a database ID and SQLAlchemy URL before asking the client to inspect or query that database. Set `RUBIKSQL_DATA_DIR` if you want its registry and knowledge workspace outside the default `runtime/data/` location. The MCP client supplies its own chat model; Python `nl2sql` uses RubikSQL's chat configuration.
 
+## Works with your CLI tools
+
+RubikSQL's stdio MCP server can be connected to the following clients from a source checkout. Run `uv sync --frozen` once, then point the client at this checkout's `.venv` Python and `scripts/mcp_server.py`. [Exact setup for each client](docs/AGENT_TOOLS.md) includes Windows examples and a protocol check.
+
+| Client | Connection | Check |
+| --- | --- | --- |
+| DeepSeek Harness | Add an `@deepseek-ai/dsh-mcp-client` stdio entry in the selected profile | Ask for `mcp__rubiksql__get_db_info` |
+| Claude Code | `claude mcp add --transport stdio rubiksql -- <python> <mcp_server.py>` | `claude mcp get rubiksql` or `/mcp` |
+| Codex CLI | `codex mcp add rubiksql -- <python> <mcp_server.py>` | `codex mcp list` or `/mcp` |
+| OpenCode | Add a local server under `mcp.servers.rubiksql` | `opencode mcp list` |
+| Other MCP clients | Start `<python> <mcp_server.py>` over stdio | List tools and call `render_template` |
+
+These clients can share **one local database knowledge workspace** by using the same checkout and `RUBIKSQL_DATA_DIR`: a database registered in one client can be inspected from another. Each client has its own MCP server process. Unlike QuoteMem's automatic conversation memory, RubikSQL does not save chat turns; the agent calls database tools explicitly. `uv run python scripts/check_mcp.py` verifies the stdio connection without a model key.
+
 ## Model configuration
 
 | Setting | Used for | When needed |
@@ -92,6 +106,7 @@ The single `DASHSCOPE_API_KEY` is sufficient for the default demo's embedding ca
 
 - [Demo details](examples/demo/README.md)
 - [Python usage](docs/PYTHON_USAGE.md)
+- [CLI agent setup](docs/AGENT_TOOLS.md)
 - [Source scope and release review](docs/SCOPE.md)
 
 The adopted snapshot contains prompt text and Python tool source. This repository has no selected RubikSQL license yet; the license and redistribution of the included patched HeavenBase wheel must be reviewed before public release. The [RubikSQL paper](https://arxiv.org/abs/2508.17590) describes the original research project.
