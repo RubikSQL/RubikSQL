@@ -6,7 +6,7 @@ Source baseline: local RubikSQL-HB `main` at `cb41144ecfab1cdef5de56e46898012c39
 
 - The existing `rubiksql_hb.nl2sql` and `rubiksql_hb.vote` answer paths, MCP server, schema registration, knowledge storage/retrieval, SQL guards, model transport, candidate/judge behavior, and their directly needed support modules.
 - The 26 answering tool declarations and their source modules. `answering_tools.json` has been reduced from 38 declarations to those 26; the 12 assistant/META declarations and their dedicated tool modules are omitted.
-- The adopted execution snapshot and its release pointer. This snapshot still contains its own verified Python tool source and prompt content. The source modules in the checkout are not substituted for the pinned snapshot during execution.
+- The adopted execution snapshot and its release pointer. This snapshot still contains its own verified Python tool source and prompt content. The checkout's tool modules mirror the selected snapshot version, but are not substituted for the pinned snapshot during execution. [Implementation version audit](IMPLEMENTATION_VERSIONS.md) records the cleanup.
 - The pinned HeavenBase wheel and dependency lock, a source-checkout MCP launcher, and an offline runtime smoke test.
 
 ## Excluded

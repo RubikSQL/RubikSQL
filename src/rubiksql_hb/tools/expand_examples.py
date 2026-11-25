@@ -5,11 +5,9 @@ def expand_examples(
     db_id: str,
     virtual_ids: list[str],
     session_id: str = "",
-    original_question: str = "",
 ) -> list:
-    """Read applicable cached question + SQL payloads for this session's virtual ids. Optional example_scope describes that precedent only; it cannot narrow the current request."""
+    """Read cached question + SQL payloads for virtual ids from the current session."""
     from ..server import knowledge_sessions
-    from .example_scope import example_applicable, example_scope_note
 
     try:
         if not session_id:
@@ -25,16 +23,11 @@ def expand_examples(
                     "error": "unknown example virtual id for this session and database",
                 })
                 continue
-            if not example_applicable(payload, original_question):
-                continue
             out.append({
                 "virtual_id": str(virtual_id).strip().upper(),
                 "question": payload.get("question"),
                 "sql": payload.get("sql"),
             })
-            scope = example_scope_note(payload)
-            if scope:
-                out[-1]["example_scope"] = scope
         return out
     except Exception as e:
         return [{"error": f"expand_examples failed: {e}"}]

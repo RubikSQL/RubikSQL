@@ -26,15 +26,6 @@ def query_spec(db_id: str, entity: str, spec: dict = {}) -> dict:
         normalized = str(entity or "").strip().lower()
         aggregate = (spec or {}).get("aggregate")
         aggregate = aggregate if isinstance(aggregate, dict) else {}
-        if normalized == "example":
-            # Raw projections/aggregates of question or SQL bypass scoped admission.
-            # Keep non-content corpus counts; row reads use the scoped exact path.
-            groups = (spec or {}).get("group_by") or []
-            if (not aggregate or any(op != "count" for metric in aggregate.values()
-                                     for op in metric)
-                    or any(field not in {"difficulty", "tables", "db_id"} for field in groups)
-                    or any(field not in {*groups, *aggregate} for field in ((spec or {}).get("select") or []))):
-                return {"error": "Example content requires request-scoped admission; use query_knowledge(entity='example')"}
         if normalized in _SPEC_HIDDEN_IDS:
             # min/max/sum/avg re-expose a persistent id under any output alias; count
             # yields an integer and stays safe.

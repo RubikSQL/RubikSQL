@@ -5,10 +5,8 @@ from ..retrieval import search_vectors
 from ..schema import ExampleEntity
 from ..prompts import current as _served_release
 from .knowledge_errors import _retrieval_failed
-from .example_scope import example_applicable, example_scope_note
 
 _EXAMPLES_TOP_K = _served_release().knob("examples_top_k")
-_EXAMPLES_INLINE_SQL = _served_release().knob("examples_inline_sql")
 
 
 def read_examples(
@@ -46,7 +44,7 @@ def read_examples(
             return _retrieval_failed("read_examples (two-stage menu)", db_id, e)
         rows_out = [{"entity_id": r.get("object_id"), "question": r.get("question"),
                      "sql": r.get("sql"), "tables": r.get("tables") or [],
-                     "difficulty": r.get("difficulty"), "contract": r.get("contract") or {}}
+                     "difficulty": r.get("difficulty")}
                     for r in rows]
         return rows_out
 
@@ -57,7 +55,7 @@ def read_examples(
     # object_id rides along: callers key on it (the cross-process determinism check compares
     # returned id lists), and `.select()` is what used to drop it.
     return [{"object_id": r.get("object_id"), "question": r.get("question"), "sql": r.get("sql"),
-             "tables": r.get("tables") or [], "difficulty": r.get("difficulty"), "contract": r.get("contract") or {}}
+             "tables": r.get("tables") or [], "difficulty": r.get("difficulty")}
             for r in rows]
 
 
@@ -66,15 +64,13 @@ def get_examples(
     question: str,
     top_k: int = _EXAMPLES_TOP_K,
     session_id: str = "",
-    original_question: str = "",
 ) -> list:
     """Retrieve similar NL→SQL examples or a session-retained three-column menu.
 
     In the default two-stage flow the model-facing menu contains only ``id``, ``question``,
     and ``sql_length``; ``id`` is backed by the structured row's session-local ``virtual_id``.
-    With ``examples_inline_sql`` enabled, ``sql`` replaces ``sql_length`` in that same
-    projection. Ranking, width and session retention are unchanged; :func:`expand_examples`
-    still resolves every returned E-id.
+    The full SQL and retrieval metadata remain in the session payload for
+    :func:`expand_examples`.
     """
     from ..server import _ws_for, knowledge_sessions
 
@@ -89,8 +85,6 @@ def get_examples(
             if row.get("error"):
                 out.append(row)
                 continue
-            if not example_applicable(row, original_question or question):
-                continue
             source_id = str(row.get("entity_id") or row.get("object_id") or "")
             virtual_id = knowledge_sessions.retain(
                 session_id, "example", db_id, source_id, row,
@@ -98,27 +92,17 @@ def get_examples(
             public = {
                 "virtual_id": virtual_id,
                 "question": row.get("question"),
+                "sql_length": len(row.get("sql") or ""),
             }
-            scope = example_scope_note(row)
-            if scope:
-                public["example_scope"] = scope
-            if _EXAMPLES_INLINE_SQL:
-                public["sql"] = row.get("sql")
-            else:
-                public["sql_length"] = len(row.get("sql") or "")
             out.append(public)
         return out
     except Exception as e:
         return [{"error": f"get_examples failed: {e}"}]
 
 
-# Keep the canonical model-facing declaration byte-identical for the delivery-only
-# experiment, including when enabled. Its unconstrained list output accepts either
-# projection; the new source still requires publication as a new pinned Tool version.
 get_examples.__doc__ = (
-    "Retrieve a MENU of applicable historical questions with id, question, and sql_length "
+    "Retrieve a MENU of similar historical questions with exactly id, question, and sql_length "
     "(Python Unicode character count), WITHOUT SQL or persistent ids. Each id is a session-local "
     "E-id. Full question + SQL payloads and retrieval metadata are already retained in this "
-    "session. Optional example_scope describes that precedent only; it cannot narrow the current request. "
-    "Pick the few most relevant and call expand_examples(virtual_ids) with their E-ids."
+    "session. Pick the few most relevant and call expand_examples(virtual_ids) with their E-ids."
 )

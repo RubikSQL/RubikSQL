@@ -7,7 +7,6 @@ def query_knowledge(
     where: dict = {},
     limit: int = 50,
     session_id: str = "",
-    original_question: str = "",
 ) -> list:
     """Query the KNOWLEDGE BASE with exact filters — the business rules, NL→SQL examples, synonyms and schema metadata curated for this database. It does NOT read the SQL database's data; run_sql does that.
     It complements get_rules, get_examples and search_values, which return only the top-k most SIMILAR records. This one returns EVERY record matching an exact filter (up to 200), so you can enumerate and count instead of sampling.
@@ -27,7 +26,6 @@ def query_knowledge(
         holding an `error` field when the entity name or the filter is invalid.
     """
     from ..server import _query_knowledge, _ws_for, knowledge_sessions
-    from .example_scope import example_applicable, example_scope_note
 
     try:
         normalized_entity = str(entity or "").strip().lower()
@@ -42,8 +40,6 @@ def query_knowledge(
             )
         out = []
         for row in rows:
-            if normalized_entity == "example" and not example_applicable(row, original_question):
-                continue
             source_id = str(row.get("entity_id") or "")
             virtual_id = knowledge_sessions.retain(
                 session_id, normalized_entity, db_id, source_id, row,
@@ -52,10 +48,6 @@ def query_knowledge(
                 "virtual_id": virtual_id,
                 **{key: value for key, value in row.items() if key != "entity_id"},
             })
-            if normalized_entity == "example":
-                scope = example_scope_note(row)
-                if scope:
-                    out[-1]["example_scope"] = scope
         return out
     except Exception as e:
         return [{"error": f"query_knowledge failed: {e}"}]

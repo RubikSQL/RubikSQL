@@ -398,7 +398,7 @@
     "required_for": []
   },
   {
-    "description": "Retrieve a MENU of applicable historical questions with id, question, and sql_length (Python Unicode character count), WITHOUT SQL or persistent ids. Each id is a session-local E-id. Full question + SQL payloads and retrieval metadata are already retained in this session. Optional example_scope describes that precedent only; it cannot narrow the current request. Pick the few most relevant and call expand_examples(virtual_ids) with their E-ids.",
+    "description": "Retrieve a MENU of similar historical questions with exactly id, question, and sql_length (Python Unicode character count), WITHOUT SQL or persistent ids. Each id is a session-local E-id. Full question + SQL payloads and retrieval metadata are already retained in this session. Pick the few most relevant and call expand_examples(virtual_ids) with their E-ids.",
     "input_schema": {
       "properties": {
         "question": {
@@ -572,7 +572,7 @@
     "required_for": []
   },
   {
-    "description": "Read applicable cached question + SQL payloads for this session's virtual ids. Optional example_scope describes that precedent only; it cannot narrow the current request.",
+    "description": "Read cached question + SQL payloads for virtual ids from the current session.",
     "input_schema": {
       "properties": {
         "virtual_ids": {
