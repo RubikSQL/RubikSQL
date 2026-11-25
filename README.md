@@ -83,7 +83,7 @@ Configure your MCP client to run that command in the repository directory. The s
 | Setting | Used for | When needed |
 | --- | --- | --- |
 | `DASHSCOPE_API_KEY` | DashScope `text-embedding-v4` for schema and knowledge vectors | Database registration and vector retrieval, unless a managed embedding key is configured |
-| `RUBIKSQL_GATEWAY_POOL` | Path to RubikSQL's private chat gateway account file | Python `nl2sql`, `nl2sql_vote`, or demo `--ask` |
+| Private chat gateway file (`RUBIKSQL_GATEWAY_POOL` overrides its default path) | RubikSQL chat account selection | Python `nl2sql`, `nl2sql_vote`, or demo `--ask` |
 | `RUBIKSQL_DATA_DIR` | Local database registry, knowledge workspace, and cache | Optional; defaults to the checkout's `runtime/data/` in the MCP launcher |
 
 The single `DASHSCOPE_API_KEY` is sufficient for the default demo's embedding calls. It does **not** configure RubikSQL's Python chat route. The current chat runtime requires its existing gateway pool format; an official profile needs both Qwen and DeepSeek account pools even when a run selects Qwen. `uv run python -m rubiksql_hb.model_config status` reports configured accounts without printing keys. Keep credential files outside the repository. The demo and smoke test do not require another database server.

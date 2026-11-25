@@ -21,6 +21,8 @@ The package layout, pinned tool importer, snapshot verification, and NL2SQL algo
 
 `uv sync --offline --frozen --no-dev` completed with the locked dependency set. `tests/smoke_runtime.py` verified the adopted snapshot, imported `nl2sql` and `nl2sql_vote`, loaded 26 pinned tools, ran a tool call, and initialized 42 MCP tools without a model key. This is a startup check, not an end-to-end answer-quality test.
 
+The documentation demo was also run from a separate local clone with a new `.venv`: `uv sync --offline --frozen`, the no-key smoke test, and `examples/demo/demo.py` with a DashScope embedding key all completed. The demo registered two tables and returned the expected rows (Ada 100, Lin 25) through the pinned SQL tool. The optional model-generated `--ask` path was not exercised because this isolated run had no chat gateway pool.
+
 ## Review before merge or public release
 
 1. Select a RubikSQL license; the target repository currently has no `LICENSE` file. Confirm attribution/redistribution of the patched HeavenBase wheel (its metadata says MIT).
