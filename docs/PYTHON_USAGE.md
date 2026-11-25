@@ -28,7 +28,7 @@ answer = nl2sql("How many orders were placed?", "shop", provider="qwen")
 print(answer["sql"], answer["rows"])
 ```
 
-Run the script from the repository root after `uv sync --frozen`. Replace the SQLite URL with your own SQLAlchemy database URL. To inspect credential configuration without exposing keys, use `uv run python -m rubiksql_hb.model_config status`; `--help` lists the supported setup commands. Do not commit API keys or local workspaces.
+Run the script from the repository root after `uv sync --frozen`. Replace the SQLite URL with your own SQLAlchemy database URL. `DASHSCOPE_API_KEY` supplies schema embeddings, but Python `nl2sql` also needs the existing private chat gateway pool; one DashScope environment key alone does not configure that route. To inspect credential configuration without exposing keys, use `uv run python -m rubiksql_hb.model_config status`; `--help` lists the supported setup commands. Do not commit API keys or local workspaces. The [demo](../examples/demo/README.md) creates its own SQLite database and exercises registration, schema inspection, and read-only SQL.
 
 `nl2sql_vote(question, db_id, ...)` in `rubiksql_hb.vote` uses multiple candidate agents and a judge. Both calls require a registered database ID. The adopted snapshot fixes their tool and prompt versions; changing a tool's checkout source file alone does not change the pinned execution version.
 
