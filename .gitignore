@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.env
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+chroma_db/
+bird_dbs/
+runtime/
+results/
+.rubiksql/

@@ -1,0 +1,998 @@
+[
+  {
+    "description": "Register an external database. Introspects its schema and stores TableEntity + ColumnEntity records.",
+    "input_schema": {
+      "properties": {
+        "desc": {
+          "default": "",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "type": "object"
+    },
+    "name": "register_database",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.register_database",
+    "qualname": "register_database",
+    "order": 0,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Return the full schema (all tables and columns) for a registered database.",
+    "input_schema": {
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "name": "get_db_info",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.get_db_info",
+    "qualname": "get_db_info",
+    "order": 1,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": [
+      "candidate"
+    ]
+  },
+  {
+    "description": "Return metadata and columns for a single table.",
+    "input_schema": {
+      "properties": {
+        "table_name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "table_name"
+      ],
+      "type": "object"
+    },
+    "name": "get_tab_info",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.get_tab_info",
+    "qualname": "get_tab_info",
+    "order": 2,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Return profile_desc for columns (value formats, nulls, ranges, sentinels). Structural info (type, PK/FK, desc) is already in get_db_info — this tool adds the statistical layer only. Measured lines (Values / Range / NULL / Rows / Docs-vs-data) are executed facts — where the documented text disagrees with them, trust the measurement. col_name omitted: return profile_desc for all columns in the table. col_name provided: return profile_desc for that single column (fuzzy name correction built in).",
+    "input_schema": {
+      "properties": {
+        "col_name": {
+          "default": "",
+          "type": "string"
+        },
+        "table_name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "table_name"
+      ],
+      "type": "object"
+    },
+    "name": "get_col_info",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.get_col_info",
+    "qualname": "get_col_info",
+    "order": 3,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Vector-search columns by keyword to find enum/categorical matches.",
+    "input_schema": {
+      "properties": {
+        "keyword": {
+          "type": "string"
+        },
+        "table_names": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "top_k": {
+          "default": 10,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "type": "object"
+    },
+    "name": "search_columns",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {},
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.search_columns",
+    "qualname": "search_columns",
+    "order": 4,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Vector-search actual cell values to find enum values matching a keyword. Use this when you know the concept (e.g. '已发货') but need to find the exact stored value (e.g. 'shipped'). `score` is the ranking key; `semantic_score` (meaning closeness) and `spelling_score` (character overlap) are its two components. The model-facing result uses strict JSON with positional rows; interpret values with normal JSON types and decode JSON string escapes before copying a stored value into SQL.",
+    "input_schema": {
+      "properties": {
+        "col_names": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "table_names": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "top_k": {
+          "default": 10,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "type": "object"
+    },
+    "name": "search_values",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.search_values",
+    "qualname": "search_values",
+    "order": 5,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Execute a SQL query and return results. Sees the base tables plus any intermediate tables saved this run via save_sql_as_table (session_id is injected by the agent).",
+    "input_schema": {
+      "properties": {
+        "sql": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sql"
+      ],
+      "type": "object"
+    },
+    "name": "run_sql",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.run_sql",
+    "qualname": "run_sql",
+    "order": 6,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Execute a SQL query against the BASE TABLES ONLY — the SAME conditions as submit_final_sql (your run's intermediate tables are NOT visible). Use this to verify a self-contained final answer before submitting: if it passes here it will pass submit.",
+    "input_schema": {
+      "properties": {
+        "sql": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sql"
+      ],
+      "type": "object"
+    },
+    "name": "run_sql_base",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.run_sql_base",
+    "qualname": "run_sql_base",
+    "order": 7,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Run SQL and save the result as a named intermediate table for THIS run, reusable by name in later run_sql. It is private to this run and never touches the base DB. submit_final_sql runs WITHOUT these intermediates, so inline them into a self-contained base-table SQL before submitting.",
+    "input_schema": {
+      "properties": {
+        "sql": {
+          "type": "string"
+        },
+        "table_name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sql",
+        "table_name"
+      ],
+      "type": "object"
+    },
+    "name": "save_sql_as_table",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.save_sql_as_table",
+    "qualname": "save_sql_as_table",
+    "order": 8,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "List the intermediate tables saved this run via save_sql_as_table.",
+    "input_schema": {
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "name": "list_temp_tables",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {},
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.list_temp_tables",
+    "qualname": "list_temp_tables",
+    "order": 9,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Validate SQL syntax then execute it as the confirmed final answer.",
+    "input_schema": {
+      "properties": {
+        "sql": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sql"
+      ],
+      "type": "object"
+    },
+    "name": "submit_final_sql",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.submit_final_sql",
+    "qualname": "submit_final_sql",
+    "order": 10,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [
+      "reviewer"
+    ],
+    "routes": {},
+    "required_for": [
+      "candidate"
+    ]
+  },
+  {
+    "description": "Drop this run's intermediates and retained virtual knowledge ids.",
+    "input_schema": {
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "name": "close_session",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.close_session",
+    "qualname": "close_session",
+    "order": 11,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Retrieve a MENU of applicable historical questions with id, question, and sql_length (Python Unicode character count), WITHOUT SQL or persistent ids. Each id is a session-local E-id. Full question + SQL payloads and retrieval metadata are already retained in this session. Optional example_scope describes that precedent only; it cannot narrow the current request. Pick the few most relevant and call expand_examples(virtual_ids) with their E-ids.",
+    "input_schema": {
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "top_k": {
+          "default": 12,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "question"
+      ],
+      "type": "object"
+    },
+    "name": "get_examples",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {},
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.get_examples",
+    "qualname": "get_examples",
+    "order": 12,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": [
+      "candidate"
+    ]
+  },
+  {
+    "description": "Save a validated NL→SQL pair to the knowledge base for future retrieval. Pass `question` exactly as it reached you, hint block included — retrieval compares the stored question's embedding against the next question's, so a stripped-down paraphrase is matched against text nobody will ask. Omit `tables` and it is read out of the SQL.",
+    "input_schema": {
+      "properties": {
+        "difficulty": {
+          "default": "medium",
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "sql": {
+          "type": "string"
+        },
+        "tables": {
+          "default": null,
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "question",
+        "sql"
+      ],
+      "type": "object"
+    },
+    "name": "save_example",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.save_example",
+    "qualname": "save_example",
+    "order": 13,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Store a synonym mapping so user terms are resolved to canonical schema names.",
+    "input_schema": {
+      "properties": {
+        "canonical": {
+          "type": "string"
+        },
+        "col_name": {
+          "default": "",
+          "type": "string"
+        },
+        "synonym": {
+          "type": "string"
+        },
+        "table_name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "table_name",
+        "synonym",
+        "canonical"
+      ],
+      "type": "object"
+    },
+    "name": "save_synonym",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.save_synonym",
+    "qualname": "save_synonym",
+    "order": 14,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Replace known synonyms in a question with canonical schema names.",
+    "input_schema": {
+      "properties": {
+        "question": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "question"
+      ],
+      "type": "object"
+    },
+    "name": "expand_synonyms",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.expand_synonyms",
+    "qualname": "expand_synonyms",
+    "order": 15,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Read applicable cached question + SQL payloads for this session's virtual ids. Optional example_scope describes that precedent only; it cannot narrow the current request.",
+    "input_schema": {
+      "properties": {
+        "virtual_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "virtual_ids"
+      ],
+      "type": "object"
+    },
+    "name": "expand_examples",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {},
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.expand_examples",
+    "qualname": "expand_examples",
+    "order": 16,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Query the KNOWLEDGE BASE with exact filters — the business rules, NL→SQL examples, synonyms and schema metadata curated for this database. It does NOT read the SQL database's data; run_sql does that. It complements get_rules, get_examples and search_values, which return only the top-k most SIMILAR records. This one returns EVERY record matching an exact filter (up to 200), so you can enumerate and count instead of sampling. `entity` selects what to read, and each carries these fields: \"rule\" — scope, title, desc, tags, triggers, example. \"example\" — question, sql, tables, difficulty. \"synonym\" — table_name, col_name, synonym, canonical. \"column\" — table_name, name, datatype_orig, datatype_anno, desc, profile_desc, is_pk, fk_ref, disabled. \"table\" — name, desc, n_rows, pks, disabled. \"enum_value\" — table_name, col_name, value. Rule/example results carry session-local `virtual_id`; other entities may carry `entity_id`. `where` filters those fields exactly; omit it to enumerate every record of that entity. Operators are $eq $ne $in $contains $like $ilike $starts_with $gt $gte $lt $lte, plus $and / $or / $not over nested filters; for the list-valued fields (tables, tags, triggers, pks) use $contains, not $in. Worked examples. Every rule specific to the current database, which get_rules may not contain: query_knowledge(entity=\"rule\", where={\"scope\": {\"$eq\": \"database\"}}). Every synonym defined for this database, which NO other tool exposes (expand_synonyms only rewrites the question): query_knowledge(entity=\"synonym\"). Every CATEGORICAL column: query_knowledge(entity=\"column\", where={\"datatype_anno\": {\"$eq\": \"CATEGORICAL\"}}). Every stored example whose SQL touches a table: query_knowledge(entity=\"example\", where={\"tables\": {\"$contains\": \"cards\"}}). The filter is always ANDed with this database, so another database's knowledge is never readable. An unknown entity name, or a filter naming a field the entity does not have, comes back as one `error` record listing the valid names.",
+    "input_schema": {
+      "properties": {
+        "entity": {
+          "type": "string"
+        },
+        "limit": {
+          "default": 50,
+          "type": "integer"
+        },
+        "where": {
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "entity"
+      ],
+      "type": "object"
+    },
+    "name": "query_knowledge",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {},
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.query_knowledge",
+    "qualname": "query_knowledge",
+    "order": 17,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "COMPUTE over the KNOWLEDGE BASE with a full query spec — aggregation, projection and ordering, where query_knowledge only filters and lists. Same six entities (rule | example | synonym | column | table | enum_value), same scope: this database's curated knowledge, never the SQL database's data (run_sql is for data). `spec` keys: filter (same operators as query_knowledge's where), select (list of fields to return), group_by (list of fields) with aggregate mapping each output name to {op: {\"field\": <field>}} where op is count | min | max | sum | avg, having, order (field names, \"-\" prefix for descending), offset, and limit (default 50, hard cap 200). Per-group counts are exact over ALL matching records, but the result lists at most `limit` rows or group rows (up to 200) — when more exist the result carries \"truncated\": true; raise limit or page with offset. Worked examples. How many enum values each column of a table carries: query_spec(entity=\"enum_value\", spec={\"filter\": {\"table_name\": {\"$eq\": \"cards\"}}, \"group_by\": [\"col_name\"], \"aggregate\": {\"n\": {\"count\": {\"field\": \"entity_id\"}}}, \"order\": [\"-n\"]}). Every table's size at a glance: query_spec(entity=\"table\", spec={\"select\": [\"name\", \"n_rows\"], \"order\": [\"-n_rows\"]}). Stored examples per difficulty: query_spec(entity=\"example\", spec={\"group_by\": [\"difficulty\"], \"aggregate\": {\"n\": {\"count\": {\"field\": \"entity_id\"}}}}). Embedding fields are never returned. rule/example rows come back WITHOUT ids (and min/max/sum/avg over their entity_id is refused — count is fine) — aggregate them here, but read them through query_knowledge or get_rules/get_examples when you need ids for update_rule or expand_examples. The filter is always ANDed with this database, so another database's knowledge is never readable.",
+    "input_schema": {
+      "properties": {
+        "entity": {
+          "type": "string"
+        },
+        "spec": {
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "entity"
+      ],
+      "type": "object"
+    },
+    "name": "query_spec",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.query_spec",
+    "qualname": "query_spec",
+    "order": 18,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Store a rule with scope global or database and return its session-local R-id.",
+    "input_schema": {
+      "properties": {
+        "desc": {
+          "type": "string"
+        },
+        "example": {
+          "default": "",
+          "type": "string"
+        },
+        "scope": {
+          "default": "global",
+          "type": "string"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "triggers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "desc"
+      ],
+      "type": "object"
+    },
+    "name": "save_rule",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.save_rule",
+    "qualname": "save_rule",
+    "order": 19,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Update a retained rule by its session-local R-id. Non-empty scope must be global or database.",
+    "input_schema": {
+      "properties": {
+        "desc": {
+          "type": "string"
+        },
+        "scope": {
+          "default": "",
+          "type": "string"
+        },
+        "virtual_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "virtual_id",
+        "desc"
+      ],
+      "type": "object"
+    },
+    "name": "update_rule",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.update_rule",
+    "qualname": "update_rule",
+    "order": 20,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Retrieve and rerank rules with session-local virtual ids. Returns at most k rules — the same number you ask for. Two vector branches each contribute k candidates and the merged set is reranked before being cut back to k, so a larger k widens the search as well as the answer.",
+    "input_schema": {
+      "properties": {
+        "exclude_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "k": {
+          "default": 20,
+          "type": "integer"
+        },
+        "question": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "question"
+      ],
+      "type": "object"
+    },
+    "name": "get_rules",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {},
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.get_rules",
+    "qualname": "get_rules",
+    "order": 21,
+    "visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "loop_visible_to": [
+      "judge"
+    ],
+    "routes": {},
+    "required_for": [
+      "candidate"
+    ]
+  },
+  {
+    "description": "Runtime-only exact trigger matcher; this tool is hidden from model allowlists.",
+    "input_schema": {
+      "properties": {
+        "exclude_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "type": "object"
+    },
+    "name": "match_rule_triggers",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {},
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.match_rule_triggers",
+    "qualname": "match_rule_triggers",
+    "order": 22,
+    "visible_to": [],
+    "loop_visible_to": [
+      "candidate",
+      "judge",
+      "reviewer"
+    ],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Check whether columns X functionally determine columns Y (X → Y) in a table.",
+    "input_schema": {
+      "properties": {
+        "table": {
+          "type": "string"
+        },
+        "x_cols": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "y_cols": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "table",
+        "x_cols",
+        "y_cols"
+      ],
+      "type": "object"
+    },
+    "name": "check_functional_dependency",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.check_functional_dependency",
+    "qualname": "check_functional_dependency",
+    "order": 23,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  },
+  {
+    "description": "Compare source rows with the logical entities they represent.",
+    "input_schema": {
+      "properties": {
+        "entity_key": {
+          "type": "string"
+        },
+        "measure_aliases": {
+          "default": "",
+          "type": "string"
+        },
+        "source_sql": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_sql",
+        "entity_key"
+      ],
+      "type": "object"
+    },
+    "name": "audit_measure_grain",
+    "output_schema": {
+      "type": "object"
+    },
+    "module": "rubiksql_hb.tools.audit_measure_grain",
+    "qualname": "audit_measure_grain",
+    "order": 24,
+    "visible_to": [
+      "candidate"
+    ],
+    "loop_visible_to": [],
+    "routes": {
+      "candidate": [
+        "grain"
+      ]
+    },
+    "required_for": [
+      "candidate"
+    ]
+  },
+  {
+    "description": "Render a SQL template by substituting {param_name} placeholders.",
+    "input_schema": {
+      "properties": {
+        "params": {
+          "type": "object"
+        },
+        "template": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "template",
+        "params"
+      ],
+      "type": "object"
+    },
+    "name": "render_template",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object",
+      "x-fastmcp-wrap-result": true
+    },
+    "module": "rubiksql_hb.tools.render_template",
+    "qualname": "render_template",
+    "order": 25,
+    "visible_to": [],
+    "loop_visible_to": [],
+    "routes": {},
+    "required_for": []
+  }
+]

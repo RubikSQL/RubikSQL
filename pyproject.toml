@@ -1,0 +1,48 @@
+[project]
+name = "rubiksql-hb"
+version = "0.1.0"
+description = "RubikSQL NL2SQL runtime built on HeavenBase"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "heavenbase==0.1.2.3",
+    "sqlalchemy>=2.0",
+    "chromadb>=0.5",
+    "python-dotenv",
+    "mcp>=1.0",
+    "httpx>=0.28",
+    "anyio",
+    "aiohttp>=3.9",
+    "starlette>=0.40",
+    "uvicorn>=0.30",
+]
+
+[tool.uv]
+prerelease = "allow"
+
+[tool.uv.sources]
+heavenbase = { path = "vendor/heavenbase-0.1.2.3-py3-none-any.whl" }
+
+[project.scripts]
+rubiksql-hb-server = "rubiksql_hb.server:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["setuptools>=62.6", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"rubiksql_hb" = ["answering_tools.json", "chat_key_denylist.sha256"]
+"rubiksql_hb.prompts" = ["AUTHORITY.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["scripts", "src"]
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 160
+target-version = ["py310"]

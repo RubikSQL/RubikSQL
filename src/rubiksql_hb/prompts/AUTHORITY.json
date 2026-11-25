@@ -1,0 +1,6 @@
+{
+ "schema": "rubiksql.authority-binding/2",
+ "authority_uuid": "99172afa-09d0-42bc-8726-c810fb215eb1",
+ "remote": "git@github.com:edsml-jz2321/RubikSQL-HB.git",
+ "ref": "refs/heads/authority/epoch-20261013-m1013"
+}
